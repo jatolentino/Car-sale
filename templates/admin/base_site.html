@@ -1,0 +1,17 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block branding %}
+  <h1 id="heard">
+    <a href="/"><img src="{% static 'img/logos/black-logo.png' %}" alt="" class="brand_img" height="50" width="300"/></a>
+  </h1>
+	{% if not user.is_authenticated %}
+	<div>
+	<h4 style="color: black; display: flex;justify-content: center;"> Username: admin</h4>
+	<h4 style="color: black; display: flex;justify-content: center;"> Password: password</h4>
+	</div>
+	{% endif %}
+{% endblock %}
+
+{% block extrastyle %}
+  <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
