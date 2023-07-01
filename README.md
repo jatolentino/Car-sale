@@ -1,5 +1,5 @@
 <h1 align="center">
-	<img src="https://github.com/jatolentino/Car-sale/blob/main/static/img/logos/icon.svg" width="200" alt="car-sale-logo">
+	<img src="https://github.com/jatolentino/Car-sale/blob/main/static/img/logos/icon1.svg" width="200" alt="car-sale-logo">
 </h1>
 
 <p align="center">
