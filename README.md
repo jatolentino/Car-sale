@@ -69,22 +69,23 @@ Start here:
 	DEBUG=True
 	SECRET_KEY='anything'
 	DB_USER=your_postgresql_user
+	DB_PASSWORD=your_postgresql_user_password
 	DB_NAME=your_datbase_name
-	DB_PASSWORD=your_database_password
 	EMAIL_HOST_USER=your_gmail
 	EMAIL_HOST_PASSWORD=your_gmail_generated_password
 	```
 - Create your database in PgAdmin
-- Once installed PostgreSQL, create your_postgresql_user and 
-- Continue the setup in the terminal, we are about to set this thing up :D
+	- Once installed PostgreSQL, create `your_postgresql_user` and `your_postgresql_user_password`
+	- Create an empty database and name it as `your_datbase_name` 
+	- To load the default database use the file `database.sql` given in the root of this project
+	- In order to load the database aforementioned, go to your PostgreSQL database and right click on it, and choose the restore option, then pick the `database.sql` file, and voilá you will have the default admin and users to login (the usernames are admin and user, and password is password :D)
+- Continue the setup in the terminal, we are about to set this whole thing up
 	```bash
 	python manage.py collectstatic
 	python manage.py makemigrations
 	python manage.py migrate
-	python manage.py createsuperuser #create a user and assign a password as you like
-	python manage.py runserver #add a port if the django default port (8000) is in use by other apps on your machine
+	python manage.py runserver 8000 #or any free port you got
 	```
-- Learn how to use below ...
 
 ## How to use
 
@@ -93,5 +94,5 @@ Start here:
 <br>
 
 <a id="Begin-Docs"></a>
-## Comprehensive guide to progressively implement this project
+## Guide to implement this project
 The pictures portray the results reached on every step and the versions keep track of the project's progress
