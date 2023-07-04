@@ -581,3 +581,366 @@ class TeamAdmin(admin.ModelAdmin):
 		list_filter = ('designation')
 admin.site.register(Team, TeamAdmin)
 ```
+
+### 20. Header and Footer 5.1
+
+- Templates/includes/topbar
+```html
+..fa-phone"></i>+51-997-008-163</a>
+..ssel.com"><i class="fa fa-envelope"></i>user@hotmail.com</a>
+..ssel.com"><i class="fa fa-clock-o"></i>Mon - Sat: 8:00am - 4:00pm</a>
+````
+- Replace 
+`<p class="copy">© 2023 <a href="#">carsale Corp.</a> All Rights Reserved.</p>` with `<p class="copy">© {% now 'Y' %} carsale Corp. All Rights Reserved.</p>`
+
+- Also in line 14: 
+```html
+<li><a href="#" class="facebook-bg"... => <li><a href="https://linkedin.com/" target="_blank" class..
+<li><a href="#" class="twitter-bg"... => <li><a href="https://linkedin.com/" target="_blank" class..
+<li><a href="#" class="google-bg"... => <li><a href="https://linkedin.com/" target="_blank" class..
+<li><a href="#" class="linkdein-bg"... => <li><a href="https://linkedin.com/" target="_blank" class..
+```
+- And in Templates/pages/home.html, line 938, questions
+```html
+<a href="contact.html" class= ... => <a href="{% url 'contact' %}" class=..
+```
+
+
+### 21. Dynamic navbar - colored on state 5.2
+- This
+```html
+<a class="nav-link dropdown-toggle" href="{% url 'home' %}"> 
+    Home
+</a>
+```
+- Modified to
+```html
+<a
+	{% if '/' == request.path %}	
+	class="nav-link active"
+	{% else %}
+	class="nav-link"
+	{% endif %}
+	href="{% url 'home' %}">
+		Home
+</a>
+```
+- And
+```html
+<a class="nav-link" href="{% url 'about' %}">
+		About
+</a>
+```
+- To
+```
+<a
+	{% if 'about' in request.path %}	
+	class="nav-link active"
+	{% else %}
+	class="nav-link"
+	{% endif %}
+	href="{% url 'about' %}">
+		About
+</a>
+```
+- Also
+```html
+<a class="nav-link" href="{% url 'services' %}">
+		Services
+</a>
+```
+- Changed to 
+```html
+<a
+	{% if 'services' in request.path%}
+  class="nav-link active"
+  {% else %}
+  class="nav-link"
+  {% endif %}
+  href="{% url 'services' %}">
+		Services
+</a>
+```
+- Here same in
+```html
+	<a class="nav-link" href="{% url 'contact' %}">Contact</a>
+</li>
+<li>
+    <li class="nav-item dropdown m-hide">
+<a href="#full-page-search" class="nav-link h-icon">
+```
+- Modified to
+```html
+<a
+	{% if 'contact' in request.path %}
+  class="nav-link active"
+  {% else %}
+  class= "nav-link"
+  {% endif %}
+  href="{% url 'contact' %}">
+    Contact
+</a> 
+```
+- In templates/pages/home.html, line 16
+```html
+<a href="services.html" class... => <a href="{% url 'services' %}" class...
+```
+
+### 22. Cars app 5.3
+
+- Stop the server, and create a new app
+```bash
+python manage.py startapp cars
+```
+- In carsale/setting.py add in Installed_apps, line 33
+```python
+INSTALLED_APPS = [
+    'cars.apps.CarsConfig',
+```
+- Copy file pages/urls.py to cars and edit cars/urls.py. Also delete all inside urlpatterns and add
+```python
+urlpatters = [
+    path('', views.cars, name='cars'),
+]
+```
+- In carsale/urls.py, inside urlspatterns brackets
+```python
+urlpatterns = [
+		...
+	  path('cars/',include('cars.urls')),
+		...
+]+ static....     ROOT)
+```
+- In cars/views.py, add
+```python
+def cars(request):
+    return render(request, 'cars/cars.html')
+```
+- In templates, create the folder cars (templates/cars) and the file cars.html (templates/cars/cars.html)
+```html
+<h2>Cars</h2>
+```
+- Now localhost:8000/cars is available but not the buttom Cars. To make cars buttom clickable, add in Templates/include/navbar.html,  line 26, `href="{% url 'cars' %}"`
+
+### 23. Setup Car Tempates 5.4
+- Add in templates/cars/cars.html,
+```html
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<!-- Sub banner start, line 124-->
+...
+<!-- Sub Banner end, line 136-->
+
+<!-- Featured car start, line 138-->       
+...
+<!-- Featured car end, line 691--> 				
+
+{% endblock %}
+```
+- Activate home button inside localhost/cars.html, line 10:
+```html
+<li><a href="index.html">Home</a></li>  => <li><a href="{% url 'home' %}">Home</a></li> 
+```
+
+### 24. Setup Car Tempates 5.5
+- Make cars button clickable in HOME, templates/includes/navbar.html, line 25
+```html
+<li class="nav-item">
+  <a                               <!-- from cars/urls.py -->
+	{% if 'cars' in request.path %}
+    class="nav-link active"
+    {% else %}
+    class="nav-link"
+    {% endif %}
+    href="{% url 'cars' %}">
+    Cars
+    </a>
+ </li>
+```
+
+> Note: Sometimes identation is a problem. To solve those kind of problems, delete the identation and add spaces manually, notepad prodives default tabs, while Atom edutir receives text in form of SPACES
+
+- Fix image logo in cars.html. In carsale/static/js/app.js, line 111, 117, 119
+```html
+..attr('src', 'static/img... => attr('src', '../static/img..
+```
+- Reload page and clean cache with CTRL + F5
+
+### 25. Create car model (5.6)  and add info of cars in DB (localhost/admin)
+- In cars/admin.py, add
+```python
+from .models. import Car
+	admin.site.register(Car)
+```
+
+- In cars/models.py , add from FILE: 6.1 choices_list_car_model.txt
+
+```python
+from django.db import models
+from datetime import datetime
+class Car(models.Model):
+    state_choice = (
+        ('AL', 'Alabama'),
+        ('AK', 'Alaska'),
+        ('AZ', 'Arizona'),
+				...
+				('WY', 'Wyoming'),
+	)
+
+    car_title = models.CharField(max_length=255)
+
+    year_choice = []
+    for r in range(2000, (datetime.now().year+1)):
+        year_choice.append((r,r))
+		
+    features_choices = (  # from choices_list_car_model.txt
+        ('Cruise Control', 'Cruise Control'),
+        ....
+        ('Bluetooth Handset', 'Bluetooth Handset'),
+    )
+		door_choices = (
+        ('2', '2'),
+				...
+        ('6', '6'),
+    )
+
+    car_title = models.CharField(max_length=255)
+    state = models.CharField(choices=state_choice, max_length=100)
+    city = models.CharField(max_length = 100)
+		...
+		...
+    no_of_owners = models.CharField(max_length = 100)
+    is_featured = models.BooleanField(max_length = 100)
+    created_date = models.DateTimeField(default=datetime.now, blank=True)
+```
+
+- Stop the server and migrate the changes to take effect
+```bash
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver 8000
+```
+- Go to localhost/admin, clickk on Cars and add a car to the DB
+
+### 26.CKEditor & MultiSelectFields 6.1 - editor of description section in DB 
+```bash
+pip install django-ckeditor
+pip install django-multiselectfield
+```
+Go to carsale/settings.py, and add the CKEditor:
+```python
+installed_apps = [ 
+...
+'ckeditor',
+]
+```
+- In cars/moldes.py, add
+```python
+from ckeditor.fields import RichTextField
+from multiselectfield import MultiSelectField
+
+ description = RichTextField()
+ features = MultiSelectField(choices=features_choices)
+ ....
+
+ def __str_(self):
+	 return self.car_title
+```
+- Make migration
+``` python
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver 8000
+```
+
+### 27.Add Car data, creating a car profile in DB 6.2
+
+- In localhost/admin, Cars -> Add Cars. Fill the info of the cars with the files in car-photos directory, only 4 cars
+
+### 28. Car Admin Customization 6.3 Custop table of cars in DB
+
+- In cars/admin.py, copy from pages/admin.py
+```python
+from django.contrib import admin
+from .models import Car
+from django.utils.html import format_html
+# Register your models here.
+
+class CarAdmin(admin.ModelAdmin):
+    def thumbnail(self, object):
+        return format_html('<img src="{}" width="40" style="border-radius: 50px;" />'.format(object.car_photo.url))           //modified in object.car_photo..
+
+    thumbnail.short_description = 'Car Image'
+    list_display = ('id', 'thumbnail', 'car_title', 'city', 'color', 'year', 'body_style', 'fuel_type', 'is_featured')
+		list_display_links = ('id', 'thumbnail', 'car_title')   // make car title clickable
+		list_editable = ('is_featured',)   // make featured editable in table
+admin.site.register(Car, CarAdmin)
+		search_fields = ('id', 'car_title', 'city', 'model', 'body_style', 'fuel_type')  //serach engine
+    list_filter = ('city', 'model', 'body_style', 'fuel_type') // filter engine
+```
+
+### 29. Featured Cars, addidng to the page 7.1
+- In pages/views.py,  line 6 onwards
+```python
+from cars.models import Car 
+teams = Team.objects.all()
+    featured_cars = Car.objects.order_by('-created_date').filter(is_featured=True)
+    data = {
+        'teams' : teams,
+        'featured_cars': featured_cars,
+    }
+```
+- In templates/pages/home.html, line 185 - 242: group slide-item, 2nd group onwards to all those groups until slick-btn
+```html
+<div class="slick-slide-item">
+...
+...
+</div>
+
+<div class="slick-btn">
+```
+
+- Add Loop in templates/pages/home.html, line 129
+```html
+{% for car in featured_cars %}
+	<div class="slick-slide-item">
+	...
+	...
+	</div>
+{% endfor %}
+```
+- Delete these lines in that group
+```html
+<span class="del"><del>$805.00</del></span>
+  <br>
+```
+- In line 164
+```html
+...ls.html">Lamborghini Huracán</a>  => ...html">{{ car.car_title }}</a>
+```
+- In line 136 
+```html...<span>$780.00</span> => ...<span>${{ car.price }}}</span> 
+```
+- In line 138 
+```html
+...src="img/car/car-1.jpg" ... => src="{{ car.car_photo.url }}" alt="car" style="min-height: 262px; max-height: 262px;">
+```
+- And below in the gallary remove one section just for 4 extrea images
+href="img/car/car-1.jpg" => href="{{ car.car_photo_1 }}"
+href="img/car/car-2.jpg" => href="{{ car.car_photo_2 }}"
+href="img/car/car-3.jpg" => href="{{ car.car_photo_3 }}"
+href="img/car/car-4.jpg" => href="{{ car.car_photo_4 }}"
+
+line 168
+..pin"></i>123 Kathal St. Tampa City,  => ..pin"></i>{{car.state}}, {{car.city}}
+
+line 172 - 177
+  <li>Petrol</li>  		=> <li>{{car.fuel_type}}</li>
+  <li>4,000 km</li>		=> <li>{{car.miles}}</li>
+  <li>Manual</li>			=> <li>{{car.transmission}}</li>
+  <li>Sport</li>			=> <li>{{car.body_style}}</li>
+  <li>white</li>			=> <li>{{car.color}}</li>
+  <li>2020</li>				=> <li>{{car.year}}</li>
