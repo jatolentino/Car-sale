@@ -993,3 +993,357 @@ def home(request):
 <span><i class="flaticon-calendar-1"></i></span>{{car.year}} 
 <span><i class="flaticon-manual-transmission"></i></span>{{car.transmission}}
 <img class="d-block w-100" src="{{car.car_photo.url}}" alt="car" style="min-height: 262px; max-height: 262px;">
+```
+
+### 31. Fix image gallery 7.3 - images display in all_cars, featured_cars
+
+- In `<div class="car-magnify-gallery">`, line 238 (first photo)
+```html
+<a href="{{car.car_photo.url}}" class="overlap-btn">
+	<i class="fa fa-expand"></i>
+	<img class="hidden" src="{{car.car_photo.url}}">
+</a>
+```
+- Repeath fo the the other 4 photos:
+```html
+{% if car.car_photo_1 %}
+<a href="{{car.car_photo_1.url}}" class="hidden">
+	<img class="hidden" src="{{car.car_photo_1.url}}">
+</a>
+{% endif %}
+```
+- Line 144 , in featured_cars
+```html
+<a href="{{car.car_photo.url}}" class="overlap-btn">  <!-- "{{ car.car_photo }}" -->
+	<i class="fa fa-expand"></i>
+	<img class="hidden" src="{{ car.car_photo.url }}">
+```
+- Also for the other 4 photos
+```html
+{% if car.car_photo_1 %}
+<a href="{{car.car_photo_1.url}}" class="hidden">
+	<img class="hidden" src="{{ car.car_photo_1.url }}">
+</a>
+{% endif %}
+```
+
+
+### 32. Human readable numbers  7.4
+
+- In carzone/seeting.py, go to installed_apps, and seth the hummanize prize for cars (numbers notation)
+```python
+INSTALLED_APPS = [
+	...
+	'django.contrib.humanize',
+]
+```
+- In templates/home.html, line 136, add `<span>${{ car.price | intcomma }}</span>`
+- In line 4
+```html
+{% block content %}
+{% load humanize %}
+{% load static %}
+```
+- Also hummanize km (kilometers), line 184
+```html
+<li>{{car.miles | intcomma}} km</li>
+```
+- In the photo of latest cars, 229, 288 km
+```html
+<span><i class="flaticon-way"></i></span>{{car.miles | intcomma }} km
+<p class="price">{{car.price | intcomma}}</p> 
+```
+
+### 33. Single page URL 8.1
+- Add in cars/migrations/urls.py
+```python
+path('<int:id>',views.car_detail,name='car_detail')
+```
+- And add in cars/migrations/views.py
+```python
+def car_detail(request,id):
+    return render(request, 'cars/car_detail.html')
+```
+- Create the file templates\cars\car_detail.html, and modify line 175 of templates\pages\home.html
+```html
+<a href="{% url 'car_detail' car.id %}">{{ car.car_title }}</a> 
+```
+
+### 34. Display single data page 8.2
+- From carhouse template, copy from car-details.html (line 128 - 140) to /templates/cars/car_detail.html
+```html
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Sub banner start -->
+<div class="sub-banner overview-bgi">
+...
+</div>
+<!-- Sub Banner end -->
+{%  endblock %}
+```
+- From carhouse template, copy from car-details.html (line 142-547) to /templates/cars/car_detail.html, inside the block content, beneath the banner code just added
+```html
+<!-- Car details page start -->
+<div class="car-details-page content-area-6">
+...
+...
+</div>
+<!-- Properties details page end -->
+```
+
+### 35. Display single car data 8.3
+- Add cars/migrations/views.py
+```python
+from django.shortcuts import render, get get_object_or_404
+from .models import Car
+
+# Create your views here.
+def cars(request):
+    return render(request, 'cars/cars.html')
+
+def car_detail(request,id):
+    single_car = get_object_or_404(Car, pk=id)
+    data= {
+        'single_car': single_car
+    }
+    return render(request, 'cars/car_detail.html', data)
+```
+- In templates/car/car_detail.html, in line 4, add humanize `{% load humanize %}` and in 9 and 12, 28: `{{single_car.car_title}}`
+- Also in line 30
+```html
+<i class="flaticon-pin"></i>{{single_car.state}}, {{single_car.city}}
+```
+- And in line 34
+```html
+<h3><span>{{single_car.price | intcomma}}</span></h3>
+```
+- For the lines 42, 45, 48, 51, 54
+```html
+{{single_car.car_photo.url}}
+{{single_car.car_photo_1.url}}
+...
+{{single_car.car_photo_4.url}}
+```
+- And in lines 44, 4 groups of images
+```html
+{%if single_car.car._photo_1%}
+  <div class="item carousel-item" data-slide-number="1">
+  <img src="{{single_car.car_photo_1.url}}"" class="img-fluid" alt="slider-car">
+</div>
+{% endif %}
+```
+- For the slide, in line 70
+```
+<img src="{{single_car.car_photo.url}}" class="img-fluid" alt="small-car">
+```
+- Line 73, add the 4 groups
+```html
+{% if single_car.car_photo_1 %}
+<li class="list-inline-item">
+	<a id="carousel-selector-1" data-slide-to="1" data-target="#carDetailsSlider">
+		<img src="{{single_car.car_photo_1.url}}" class="img-fluid" alt="small-car">
+	</a>
+</li>
+{% endif %}
+````
+
+### 36. Display Single Car Data - Part 02 (8.4: http://localhost:8000/cars/3)
+- In Description, remove it line 121, add instead `{{single_car.description | safe}}` 
+- Delete 179-267 , 2 groups of:
+```html
+<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12>
+...
+</div>
+```
+- Now delete almost all `<li>` and leave one `<li>` group
+```html
+<li>
+	Adaptive Cruise control --> {{single_car.features}}
+</li>
+```
+- In line 160:
+```html
+<li>
+   <span>Body Style:</span>Convertible -->  <span>Color: </span>{{ single_color.color}}
+</li>
+```
+- Fix vehicle overview buttom color in carzone/static/css/style.css, line 9767 - 9769: already fixed.
+
+### 37. Setup dedicacted cars page 8.5 - make info of Cars(home) and Cars tab
+
+- In templates/pages/home.html, line 134, 179, 275, 278
+```html
+<a href="car-details.html" class="car-img">  => "{% url 'car_detail' car.id %}"
+<a href="car-details.html"> => "{% url 'car_detail' car.id %}"
+<a href="car-details.html">Lamborghini Huracán</a>  => "{% url 'car_detail' car.id %}"
+<a href="car-details.html">  => "{% url 'car_detail' car.id %}"
+```
+- Make info of cars tab, for that keep just one group line 82 - 136
+- From line 137 - 191 2nd group onwards, delete them and keep:
+```html
+{% for car in cars %}          <!-- add this for loop -->
+<div class="col-lg-6 col-md-6">
+...
+</div>
+{% endfor %}
+	<!-- Page navigation start 
+<div class="pagination-box p-box-2 text-center">
+```
+- In cars/view.py, edit
+```python
+def cars(request):
+    cars = Car.objects.order_by('-created_date')
+    data = {
+        'cars': cars,
+    }
+    return render(request, 'cars/cars.html',data)
+```
+- In lines 31 & 34 of templates/cars/cars.html, add hummanize in line 5
+```html
+{% block content %}
+
+{% load humanize %}
+
+<a href="car-details.html" class="car-img">  => "{{ url 'car_detail' car.id %}}"
+<span>$780.00</span>  => <span>${{ car.price | intcomma}}</span> 
+Line 42,44,46,47,49,50,52,53,55 and 56, repeat it
+<a href="img/car/car-1.jpg" =>  <a href="{{car.car_photo.url}}" 
+... src="img/car/car-1.jpg" alt="car"> => ... src="{{ car.car_photo.url }}" alt="car">
+
+{% if car.car_photo_1 %}
+<a href="{{car.car_photo_1.url}}" class="hidden" >
+	<img class="hidden" src="{{car.car_photo_1.url}}">
+</a>
+{% endif %}
+```
+- In Line 65 to 79
+```html
+...>Lamborghini Huracán</a> => >{{car.car_title}}</a>      
+.....</i>123 Kathal St. Tampa City => .....</i>{{car.state}}, {{car.city}}
+```
+- And in line 36 
+```html
+<img class="d-block w-100" src="{{ car.car_photo.url }}" alt="car">  =>
+...car.car_photo.url }}" alt="car" style="min-height: 262px; max-height: 262px;">
+```
+
+### 38. Using paginator 8.6 - 8.7
+
+- Add these lines in cars/view.py
+```python
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+def cars(request):
+    cars = Car.objects.order_by('-created_date')
+    paginator = Paginator(cars,3)       //2 per page or 4 or 3
+    page = request.GET.get('page')
+    paged_cars = paginator.get_page(page)
+    data = {
+        'cars': paged_cars,
+    }
+```
+- In templates/cars/cars.html, line 95, wrap pagination
+```html
+{% if cars.has_other_pages %}
+	<ul class="pagination">
+	...
+	</ul>
+{% endif %}
+```
+- Add line 99 in
+```html
+{%if cars.has_previous %}
+ <li class="page-item">
+ <a class="page-link" href="?page={{cars.previous_page_number}}"><i class="fa fa-angle-left"></i></a>
+ </li>
+{% else %}
+```
+- Delete 109 and 110 and keep the code above, wrap it with an if/else clause (previous button)
+```html
+{% if cars.has_previous %}
+	<li class="page-item">
+		<a class="page-link" href="?page={{cars.previous_page_number}}"><i class="fa fa-angle-left"></i></a>
+	</li>
+{% else %}
+```
+- For next button or arrow , line 117
+```html
+{% if cars.has_next %}
+<li class="page-item">
+<a class="page-link" href="?page={{cars.next_page_number}}"><i class="fa fa-angle-right"></i></a>
+</li>
+{% else %}
+<li class="page-item disabled">
+<a class="page-link"><i class="fa fa-angle-right"
+```
+
+### 39. Seach Page Setup 9.1
+
+- In cars/urls.py
+```python
+urlpatterns = [
+    path('', views.cars, name='cars'),
+    path('<int:id>',views.car_detail,name='car_detail'),
+    path('search', views.search, name='search'),
+]
+```
+- Add In cars/views.py
+```python
+def search(request):
+	cars= Car.objects.order_by('-created_date')
+	data={
+		'cars': cars,
+	}
+	return render(request, 'cars/search.html', data)
+```
+- Create templates\cars\search.html, and add `<h2> Search</h2>`
+- Prove if it is working in localhost:8000/cars/search
+
+
+- Note: jump to the step 40
+    - Copy `<!-- Full Page Search -->` from templates/base.html to templates/pages/home.html
+    and modify like from line 357
+    ```html
+    <!-- Full Page Search -->
+    <div id="full-page-search">
+        <button type="button" class="close">×</button>
+        <form action="{% url 'search' %}" class="search-header">
+            <input type="search" value="" placeholder="type keyword(s) here. Eg: audi, benz etc" name='keyword'/>
+            <button type="submit" class="btn btn-sm button-theme">Search</button>
+        </form>
+    </div>
+    ```
+
+    - Prove in `http://localhost:8000/`,  click on search type Benz, should take you to the search.html page
+    - From the template carhouse/search.html, copy the Banner group to templates/cars/serach.html, and lines 147-659
+    ```html
+    {% extends 'base.html' %}
+
+    {% block content %}
+    {% load humanize %}
+    <!-- Banner start -->
+    ...
+    <!-- Banner end -->
+
+    <!-- Search box 3 start -->
+    ...
+    ...
+    <!-- Featured car end -->
+    {% endblock %}
+    ```
+
+    - Now, delete the groups below `<div class="col-lg-4 col-md-6">`, line 187-526 and add the for loop, line 120-187
+    ```html
+    {% for car in  cars %}
+        <div class="col-lg-4 col-md-6">
+        ...
+    {% endfor %}
+    ```
+    - These loops are raplaced by the loop of templates/pages/home.html
+    ```html
+    {% for car in cars %}              <!-- cars* not all all_cars -->
+    <div class="col-lg-4 col-md-6">
+        ...
+        ...
+    {% endfor %}
+    ```
