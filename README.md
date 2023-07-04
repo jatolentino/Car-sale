@@ -921,26 +921,75 @@ teams = Team.objects.all()
 ```html
 ...ls.html">Lamborghini Huracán</a>  => ...html">{{ car.car_title }}</a>
 ```
+
 - In line 136 
-```html...<span>$780.00</span> => ...<span>${{ car.price }}}</span> 
+```html
+...<span>$780.00</span> => ...<span>${{ car.price }}}</span> 
 ```
+
 - In line 138 
 ```html
 ...src="img/car/car-1.jpg" ... => src="{{ car.car_photo.url }}" alt="car" style="min-height: 262px; max-height: 262px;">
 ```
+
 - And below in the gallary remove one section just for 4 extrea images
+```html
 href="img/car/car-1.jpg" => href="{{ car.car_photo_1 }}"
 href="img/car/car-2.jpg" => href="{{ car.car_photo_2 }}"
 href="img/car/car-3.jpg" => href="{{ car.car_photo_3 }}"
 href="img/car/car-4.jpg" => href="{{ car.car_photo_4 }}"
-
-line 168
+```
+- In line 168
+```html
 ..pin"></i>123 Kathal St. Tampa City,  => ..pin"></i>{{car.state}}, {{car.city}}
+```
 
-line 172 - 177
+- In line 172 - 177
+```html
   <li>Petrol</li>  		=> <li>{{car.fuel_type}}</li>
   <li>4,000 km</li>		=> <li>{{car.miles}}</li>
-  <li>Manual</li>			=> <li>{{car.transmission}}</li>
-  <li>Sport</li>			=> <li>{{car.body_style}}</li>
-  <li>white</li>			=> <li>{{car.color}}</li>
-  <li>2020</li>				=> <li>{{car.year}}</li>
+  <li>Manual</li>		=> <li>{{car.transmission}}</li>
+  <li>Sport</li>		=> <li>{{car.body_style}}</li>
+  <li>white</li>		=> <li>{{car.color}}</li>
+  <li>2020</li>			=> <li>{{car.year}}</li>
+```
+
+### 30. Latest Cars, addidng to the page 7.2
+- Delete groups Line 273 - 337  onwards
+```html
+<div class="col-lg-4 col-md-6"> 
+...
+</div>
+```
+
+- In pages/view.py, edit
+```python
+def home(request):
+    teams = Team.objects.all()
+    featured_cars = Car.objects.order_by('-created_date').filter(is_featured=True)
+    all_cars = Car.objects.order_by('created_date')
+    data = {
+        'teams' : teams,
+        'featured_cars': featured_cars,
+        'all_cars': all_cars,
+    }
+    return render(request,'pages/home.html', data)
+```
+- Add the loop in templates/pages/home.html, line 208 - 274
+```html
+{% for car in all_cars %}
+  <div class="col-lg-4 col-md-6">
+  ...
+	</div>
+{% endfor %} 
+```
+- And in lines: 256, 260, 266, 269, 218, 221, 224,214
+```html
+<a href="car-details.html">{{car.car_title}}</a> 
+<i class="flaticon-pin"></i>{{car.state}}, {{car.city}} 
+<p class="cartype">{{car.body_style}}</p> 
+<p class="price">{{car.price}}</p>  
+<span><i class="flaticon-way"></i></span>{{car.miles}} km 
+<span><i class="flaticon-calendar-1"></i></span>{{car.year}} 
+<span><i class="flaticon-manual-transmission"></i></span>{{car.transmission}}
+<img class="d-block w-100" src="{{car.car_photo.url}}" alt="car" style="min-height: 262px; max-height: 262px;">
