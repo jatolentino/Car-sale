@@ -21,7 +21,6 @@
 
 </div>
 
-
 ## Features 
 Project features
 <details>
