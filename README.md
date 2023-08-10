@@ -5,7 +5,6 @@
 <p align="center">
     A Car Sale point
 </p>
-
 <div align="center">
 
 ![Static Badge](https://img.shields.io/badge/downloads-221-red?logo=GitHub)
