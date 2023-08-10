@@ -36,7 +36,7 @@ Project features
 </details>
 
 <p align="center">
-    	<img src="https://raw.githubusercontent.com/jatolentino/Car-sale/main/media/home.jpg">
+    	<img src="https://raw.githubusercontent.com/jatolentino/Car-sale/main/media/home1.jpg">
 </p>
 
 	
