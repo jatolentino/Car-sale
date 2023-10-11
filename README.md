@@ -2,6 +2,7 @@
 	<img src="https://raw.githubusercontent.com/jatolentino/Car-sale/main/static/img/logos/icon1.svg" width="200" alt="car-sale-logo">
 </h1>
 
+
 <p align="center">
     A Car Sale point
 </p>
