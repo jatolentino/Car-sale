@@ -7,6 +7,7 @@
 </p>
 <div align="center">
 
+
 ![Static Badge](https://img.shields.io/badge/downloads-221-red?logo=GitHub)
 ![GitHub repo size](https://img.shields.io/github/repo-size/jatolentino/Car-sale)
 ![GitHub language count](https://img.shields.io/github/languages/count/jatolentino/Car-sale?color=success&logo=CodersRank&logoColor=%23FFFFFF)
